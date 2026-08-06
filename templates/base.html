@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}HomeLab Dashboard{% endblock %}</title>
+    <style>
+        :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #111827; color: #e5e7eb; }
+        body { margin: 0; min-height: 100vh; background: linear-gradient(135deg, #111827, #172554); }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 6vw; border-bottom: 1px solid #334155; }
+        main { max-width: 1100px; margin: 0 auto; padding: 3rem 6vw; }
+        a { color: #67e8f9; }
+        button { cursor: pointer; border: 0; border-radius: 6px; padding: .65rem 1rem; background: #22d3ee; color: #082f49; font-weight: 700; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 2rem 0; }
+        .card { border: 1px solid #334155; background: #0f172a; border-radius: 8px; padding: 1.25rem; }
+        .metric { font-size: 2rem; font-weight: 800; margin-top: .5rem; }
+        table { width: 100%; border-collapse: collapse; background: #0f172a; }
+        th, td { padding: .8rem; text-align: left; border-bottom: 1px solid #334155; }
+        .status-up { color: #86efac; } .status-down { color: #fca5a5; } .status-unknown { color: #fde68a; }
+        .form { max-width: 420px; margin: 4rem auto; } label { display: block; margin-top: 1rem; } input { width: 100%; box-sizing: border-box; margin-top: .4rem; padding: .7rem; border: 1px solid #475569; border-radius: 5px; background: #020617; color: #e5e7eb; }
+        .error { color: #fca5a5; }
+    </style>
+</head>
+<body>
+<header>
+    <strong><a href="{% url 'dashboard:home' %}">HomeLab / Control</a></strong>
+    {% if user.is_authenticated %}
+    <nav>
+        {% if user.is_staff %}<a href="{% url 'dashboard:admin_portal' %}">Admin portal</a>{% endif %}
+        <form method="post" action="{% url 'dashboard:logout' %}" style="display:inline; margin-left:1rem;">{% csrf_token %}<button type="submit">Sign out</button></form>
+    </nav>
+    {% endif %}
+</header>
+<main>{% block content %}{% endblock %}</main>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | HomeLab{% endblock %}
+{% block content %}
+<h1>Network overview</h1>
+<p>Welcome back, {{ user.get_username }}. This dashboard will become the home for endpoint health and device discovery.</p>
+<div class="grid">
+    <div class="card"><span>Online devices</span><div class="metric">{{ device_count }}</div></div>
+    <div class="card"><span>Open incidents</span><div class="metric">{{ open_incidents }}</div></div>
+    <div class="card"><span>Endpoints up</span><div class="metric status-up">{{ endpoint_counts.up|default:0 }}</div></div>
+    <div class="card"><span>Endpoints down</span><div class="metric status-down">{{ endpoint_counts.down|default:0 }}</div></div>
+</div>
+<section>
+    <h2>Monitored endpoints</h2>
+    {% if endpoints %}
+    <table><thead><tr><th>Name</th><th>URL</th><th>Status</th><th>Last checked</th><th>Latency</th></tr></thead><tbody>
+    {% for endpoint in endpoints %}<tr><td>{{ endpoint.name }}</td><td>{{ endpoint.url }}</td><td class="status-{{ endpoint.status }}">{{ endpoint.get_status_display }}</td><td>{{ endpoint.last_checked_at|default:"Never" }}</td><td>{% if endpoint.last_latency_ms %}{{ endpoint.last_latency_ms }} ms{% else %}--{% endif %}</td></tr>{% endfor %}
+    </tbody></table>
+    {% else %}<div class="card"><p>No monitored endpoints yet. An administrator can add the first endpoint through the admin portal.</p></div>{% endif %}
+</section>
+{% endblock %}

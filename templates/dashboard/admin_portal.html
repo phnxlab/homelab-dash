@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Admin Portal | HomeLab{% endblock %}
+{% block content %}
+<h1>Admin portal</h1>
+<p>Administrative controls are intentionally separate from the operator dashboard.</p>
+<div class="grid">
+    <a class="card" href="{% url 'admin:index' %}"><strong>Manage data</strong><br>Endpoints, devices, scan targets, checks, and incidents.</a>
+    <div class="card"><strong>Next implementation</strong><br>Background monitoring and Home Assistant discovery will appear here.</div>
+</div>
+{% endblock %}
