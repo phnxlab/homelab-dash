@@ -3,8 +3,17 @@
 {% block content %}
 <h1>Admin portal</h1>
 <p>Administrative controls are intentionally separate from the operator dashboard.</p>
+{% if messages %}{% for message in messages %}<p class="card">{{ message }}</p>{% endfor %}{% endif %}
 <div class="grid">
     <a class="card" href="{% url 'admin:index' %}"><strong>Manage data</strong><br>Endpoints, devices, scan targets, checks, and incidents.</a>
-    <div class="card"><strong>Next implementation</strong><br>Background monitoring and Home Assistant discovery will appear here.</div>
+    <div class="card">
+        <strong>Home Assistant discovery</strong><br>
+        {% if home_assistant_configured %}
+        <p>Import network-aware devices from the Home Assistant device registry.</p>
+        <form method="post" action="{% url 'dashboard:home_assistant_sync' %}">{% csrf_token %}<button type="submit">Sync devices</button></form>
+        {% else %}
+        <p>Configure HOME_ASSISTANT_URL and HOME_ASSISTANT_TOKEN to enable syncing.</p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

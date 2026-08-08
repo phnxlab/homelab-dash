@@ -46,7 +46,8 @@ class DiscoveredDevice(models.Model):
         MANUAL = "manual", "Manual"
 
     hostname = models.CharField(max_length=255, blank=True)
-    ip_address = models.GenericIPAddressField()
+    external_id = models.CharField(max_length=255, null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
     mac_address = models.CharField(max_length=17, blank=True)
     source = models.CharField(max_length=20, choices=Source.choices)
     is_online = models.BooleanField(default=True)
@@ -54,11 +55,18 @@ class DiscoveredDevice(models.Model):
     metadata = models.JSONField(default=dict, blank=True)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["ip_address", "source"], name="unique_device_source")]
+        constraints = [
+            models.UniqueConstraint(fields=["ip_address", "source"], name="unique_device_source"),
+            models.UniqueConstraint(
+                fields=["external_id", "source"],
+                condition=models.Q(external_id__isnull=False),
+                name="unique_external_device_source",
+            ),
+        ]
         ordering = ["ip_address"]
 
     def __str__(self):
-        return self.hostname or self.ip_address
+        return self.hostname or self.ip_address or self.external_id or "Unnamed device"
 
 
 class ScanTarget(models.Model):

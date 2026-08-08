@@ -1,7 +1,11 @@
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Q
 from django.shortcuts import redirect, render
+
+from discovery.home_assistant import HomeAssistantError, HomeAssistantProvider
 
 from .models import DiscoveredDevice, Incident, MonitoredEndpoint
 
@@ -45,4 +49,26 @@ def home(request):
 @login_required
 @user_passes_test(lambda user: user.is_staff)
 def admin_portal(request):
-    return render(request, "dashboard/admin_portal.html")
+    return render(
+        request,
+        "dashboard/admin_portal.html",
+        {"home_assistant_configured": bool(settings.HOME_ASSISTANT_URL and settings.HOME_ASSISTANT_TOKEN)},
+    )
+
+
+@login_required
+@user_passes_test(lambda user: user.is_staff)
+def home_assistant_sync(request):
+    if request.method != "POST":
+        return redirect("dashboard:admin_portal")
+    try:
+        summary = HomeAssistantProvider().sync()
+    except HomeAssistantError as error:
+        messages.error(request, str(error))
+    else:
+        messages.success(
+            request,
+            f"Home Assistant sync complete: {summary.discovered} imported, "
+            f"{summary.updated} updated, {summary.skipped} skipped without a valid IP.",
+        )
+    return redirect("dashboard:admin_portal")

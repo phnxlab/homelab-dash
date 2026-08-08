@@ -9,6 +9,7 @@ A Django-based starting point for a LAN-only homelab network dashboard.
 - Django admin at `/admin/` for managing the initial data models.
 - SQLite persistence with migrations.
 - Models for monitored endpoints, health-check results, discovered devices, scan targets, and incidents.
+- Home Assistant device-registry sync for devices with a valid IP address.
 - Secure defaults for sessions, CSRF, clickjacking, and content sniffing.
 
 Network discovery and background monitoring are the next implementation slice. They should run as bounded background jobs and never block a dashboard request.
@@ -25,6 +26,30 @@ python manage.py runserver
 ```
 
 Open `http://127.0.0.1:8000/`, then sign in with the local account. Staff users can open the admin portal and Django admin.
+
+## Home Assistant discovery
+
+1. In Home Assistant, open your profile menu, create a long-lived access token, and copy it immediately. Home Assistant only displays the token once.
+2. Add the Home Assistant URL and token to the deployment `.env` file:
+
+```env
+HOME_ASSISTANT_URL=http://192.168.88.20:8123
+HOME_ASSISTANT_TOKEN=your-long-lived-access-token
+HOME_ASSISTANT_TIMEOUT_SECONDS=10
+```
+
+3. Restart the container so it receives the updated environment:
+
+```powershell
+docker compose up -d
+```
+
+4. Sign in with a staff account and open `/admin-portal/`.
+5. Select **Sync devices**, then inspect the imported records under Django admin at `/admin/`.
+
+The sync uses Home Assistant's device registry and state APIs. It imports the device name, IP address, MAC address, manufacturer, model, area, and Home Assistant device ID. Devices without a valid IP address are reported as skipped because Home Assistant does not expose network addresses for every integration. The token is sent only as an API bearer header and is not stored in the database.
+
+If the sync reports an API failure, check that the URL is reachable from the Docker container, the token is valid, and the Home Assistant API is available at `/api/`. Do not put the token in a committed file or share it in logs.
 
 Run validation with:
 
