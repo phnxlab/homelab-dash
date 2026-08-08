@@ -38,6 +38,8 @@ HOME_ASSISTANT_TOKEN=your-long-lived-access-token
 HOME_ASSISTANT_TIMEOUT_SECONDS=10
 ```
 
+When Home Assistant is behind Nginx Proxy Manager, use its HTTPS hostname instead of the internal IP and port, for example `HOME_ASSISTANT_URL=https://homeassistant.example.local`. In the corresponding Nginx Proxy Manager Proxy Host, enable **Websockets Support**. Device and entity registry data is fetched through Home Assistant's WebSocket API at `/api/websocket`; the normal REST API is used only for current entity states.
+
 3. Restart the container so it receives the updated environment:
 
 ```powershell
